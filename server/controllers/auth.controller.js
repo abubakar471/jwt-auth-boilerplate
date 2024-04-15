@@ -36,7 +36,6 @@ export const signUp = async (req, res, next) => {
     }
 }
 
-
 export const signIn = async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -59,7 +58,7 @@ export const signIn = async (req, res, next) => {
         return res.status(400).json({ message: "Invalid Email Or Password" });
     }
 
-    const token = jwt.sign({ _id: existingUser?._id, }, process.env.JWT_SECRET, { expiresIn: "35s" })
+    const token = jwt.sign({ _id: existingUser?._id, }, process.env.JWT_SECRET,{expiresIn : "30d"})
 
     console.log("generated token\n", token);
 
@@ -69,7 +68,7 @@ export const signIn = async (req, res, next) => {
 
     res.cookie(String(existingUser._id), token, {
         path: "/",
-        expires: new Date(Date.now() + 1000 * 60), //30s
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), //30d
         httpOnly: true,
         sameSite: "lax"
     })
@@ -83,7 +82,6 @@ export const signIn = async (req, res, next) => {
         }
     });
 }
-
 
 export const refreshToken = async (req, res, next) => {
     const cookies = req.headers.cookie;
@@ -99,20 +97,21 @@ export const refreshToken = async (req, res, next) => {
 
         jwt.verify(String(prevToken), process.env.JWT_SECRET, (err, user) => {
             if (err) {
-                return res.status(403).json({ message: "Authentication Failed" });
+                console.log(err)
+                res.status(403).json({ message: "Authentication Failed" });
             }
 
             res.clearCookie(`${user?._id}`);
             req.cookies[`${user?._id}`] = "";
 
             // generate new refresh token
-            const token = jwt.sign({ _id: user?._id, }, process.env.JWT_SECRET, { expiresIn: "35s" });
+            const token = jwt.sign({ _id: user?._id, }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
             console.log("re-generated token\n", token);
 
             res.cookie(String(user._id), token, {
                 path: "/",
-                expires: new Date(Date.now() + 1000 * 60), //30s
+                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), //30d
                 httpOnly: true,
                 sameSite: "lax"
             })
@@ -123,10 +122,9 @@ export const refreshToken = async (req, res, next) => {
         next();
     } catch (err) {
         console.log(err)
-        return res.status(400).json({ message: "Invalid Token" });
+        res.status(400).json({ message: "Invalid Token" });
     }
 }
-
 
 export const signOut = async (req, res, next) => {
     const cookies = req.headers.cookie;
@@ -148,7 +146,7 @@ export const signOut = async (req, res, next) => {
             res.clearCookie(`${user?._id}`);
             req.cookies[`${user?._id}`] = "";
 
-            return res.status(200).json({success : true, message : "Signed Out Successfully"})
+            return res.status(200).json({ success: true, message: "Signed Out Successfully" })
         });
 
         next();

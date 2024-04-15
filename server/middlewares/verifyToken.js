@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const verifyToken = async (req, res, next) => {
     const cookies = req.headers.cookie;
     console.log("verifiying this cookies : ", cookies);
-    
+
     try {
         const token = cookies.split("=")[1];
 
@@ -15,7 +15,7 @@ const verifyToken = async (req, res, next) => {
 
         jwt.verify(String(token), process.env.JWT_SECRET, (err, user) => {
             if (err) {
-                return res.status(400).json({ message: "Invalid Token" });
+             res.status(400).json({ message: "Invalid Token" });
             }
 
             req._id = user._id
@@ -23,8 +23,8 @@ const verifyToken = async (req, res, next) => {
 
         next();
     } catch (err) {
-        console.log(err)
-        return res.status(400).json({ message: "Invalid Token" });
+        console.log(err);
+        res.status(400).json({ message: "Invalid Token" });
     }
 
 }
