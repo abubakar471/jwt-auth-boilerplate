@@ -15,7 +15,8 @@ const verifyToken = async (req, res, next) => {
 
         jwt.verify(String(token), process.env.JWT_SECRET, (err, user) => {
             if (err) {
-             res.status(400).json({ message: "Invalid Token" });
+                console.log('verifying token error : ', err.message);
+                res.status(403).json({ message: "Invalid Token" });
             }
 
             req._id = user._id
@@ -24,7 +25,7 @@ const verifyToken = async (req, res, next) => {
         next();
     } catch (err) {
         console.log(err);
-        res.status(400).json({ message: "Invalid Token" });
+        res.status(401).json({ message: "Invalid Token" });
     }
 
 }

@@ -1,6 +1,9 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { authApi } from "../services/auth/authService";
 axios.defaults.withCredentials = true;
+
+
 
 const authSlice = createSlice({
     name: "auth",
@@ -11,6 +14,12 @@ const authSlice = createSlice({
         },
         signout(state) {
             state.isSignedIn = false;
+        },
+        setCredentials(state, { payload }) {
+            if (payload?.data?.user) {
+                state.isSignedIn = true;
+                state.user = payload?.data?.user;
+            }
         },
         async getUser(state) {
             try {
@@ -32,5 +41,10 @@ const authSlice = createSlice({
 export const authActions = authSlice.actions;
 
 export const store = configureStore({
-    reducer: authSlice.reducer
+    reducer: {
+        auth: authSlice.reducer,
+        [authApi.reducerPath]: authApi.reducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(authApi.middleware),
 })

@@ -22,7 +22,7 @@ const Welcome = () => {
         } catch (err) {
             console.log(err);
 
-            if (err?.response?.status === 400) {
+            if (err?.response?.status === 401) {
                 navigate("/signin")
             }
         } finally {
@@ -30,34 +30,39 @@ const Welcome = () => {
         }
     }
 
-    const refreshToken = async () => {
-        try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/refresh-token`, { withCredentials: true });
-            const data = res.data;
+    // const refreshToken = async () => {
+    //     try {
+    //         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/refresh-token`, { withCredentials: true });
+    //         const data = res.data;
 
-            if (data.success) {
-                setUser(data?.data?.user);
-            }
-        } catch (err) {
-            console.log(err);
+    //         if (data.success) {
+    //             setUser(data?.data?.user);
+    //         }
+    //     } catch (err) {
+    //         console.log(err);
 
-            if (err?.response?.status === 400) {
-                navigate("/signin")
-            }
-        }
-    }
+    //         if (err?.response?.status === 400) {
+    //             navigate("/signin")
+    //         }
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     if (firstRender) {
+    //         getUser();
+    //     }
+
+    //     let interval = setInterval(() => {
+    //         refreshToken();
+    //     }, 1000 * 28)
+
+    //     return () => clearInterval(interval);
+    // }, [])
+
 
     useEffect(() => {
-        if (firstRender) {
-            getUser();
-        }
-
-        let interval = setInterval(() => {
-            refreshToken();
-        }, 1000 * 28)
-
-        return () => clearInterval(interval);
-    }, [])
+        getUser();
+    },[])
 
     return (
         <>
